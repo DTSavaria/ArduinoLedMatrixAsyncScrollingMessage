@@ -39,6 +39,16 @@ public:
     next = nullptr;
   }
 
+  /**
+   * Show the message on the LED Matrix.
+   * 
+   * Before calling this. the matrix should be set up.
+   * See the included example files for more detail.
+   *   matrix.begin();
+   *   matrix.beginDraw();
+   *   matrix.textScrollSpeed(60);
+   *   matrix.setCallback(matrixCallback);
+   */
   void showMessage() {
     matrix.textFont(font);
     matrix.beginText(0, 1, 0xFFFFFF);
@@ -48,26 +58,54 @@ public:
     matrix.play();
   }
 
+  /**
+   * Get the message that will display
+   */
   const String& getMessage() const {
     return message;
   }
 
+  /**
+   * Returns true if this message object has a continuation. This happens
+   * when using generateMessages and the message is longer than a single
+   * scroll can handle
+   */
   bool hasContinuation() const {
     return hContinuation;
   }
 
+  /**
+   * Returns true if this message object is a continuation. This happens
+   * when using generateMessages and the message is longer than a single
+   * scroll can handle
+   */
   bool isContinuation() const {
     return iContinuation;
   }
 
+  /**
+   * Returns true if there is a next message. The next message could be a
+   * continuation or it could be a separate message to display next
+   */
   bool hasNext() const {
     return next != nullptr;
   }
 
+  /**
+   * Returns a pointer to the next message if there is a next message.
+   * The next message could be a continuation or it could be a separate
+   * message to display next.
+   */
   AsyncScrollingMessage* getNext() {
     return next;
   }
 
+  /**
+   * Inserts the given message to be the next message. If this message has a
+   * continuation, this will automatically find the next message that does not
+   * have a continuation, and insert the given message between that message and
+   * that messsages current getNext if it exists. Return a pointer to nextMessage
+   */
   AsyncScrollingMessage* insertNext(AsyncScrollingMessage* nextMessage) {
     AsyncScrollingMessage* findLast = nextMessage;
     while (findLast->hasContinuation()) {
@@ -77,11 +115,28 @@ public:
     return setNext(nextMessage);
   }
 
+  /**
+   * Simply set the next message to nextMessage and return a pointer to
+   * nextMessage. The pointer to the current next message will be lost if not
+   * stored before calling this.
+   */
   AsyncScrollingMessage* setNext(AsyncScrollingMessage* nextMessage) {
     next = nextMessage;
     return nextMessage;
   }
 
+  /**
+   * Generate the minimum number of AsyncScrollingMessages required to display
+   * a scroll of the entire given message and return a pointer to the first
+   * object. Multiple objects may be required because of memory limitations
+   * in the Arudino's built in scrolling code. If multiple objects are
+   * required, the returned message object return true when calling
+   * hasContinuation. It will return false if the message fits in a single
+   * object.
+   * 
+   * Note that continued messages will have some overlapping characters, which
+   * is required for scrolling to work smoothly.
+   */
   static AsyncScrollingMessage* generateMessages(
     const String& message,
     ArduinoLEDMatrix& matrix,
@@ -114,6 +169,12 @@ private:
     const Font& font,
     bool iContinuation) {
 
+    // the following code determines if multiple AsyncScrollingMessage objects
+    // are required to display the entire message. In the case where a message
+    // has to be split up and a continuation is required, there will be some
+    // overlap in the characters stored in each object. this is required to
+    // scroll the message smoothly.
+    //
     size_t screenChars = (matrix.width() / font.width);
     size_t maxFullyScrollChars = animMaxChars / font.width;
     size_t maxShownChars = maxFullyScrollChars + screenChars;
