@@ -1,0 +1,13 @@
+# Datatypes (KEYWORD1)
+AsyncScrollingMessage KEYWORD1
+
+# Methods and Functions (KEYWORD2)
+showMessage KEYWORD2
+getMessage KEYWORD2
+hasContinuation KEYWORD2
+isContinuation KEYWORD2
+hasNext KEYWORD2
+getNext KEYWORD2
+insertNext KEYWORD2
+setNext KEYWORD2
+generateMessages KEYWORD2
