@@ -2,6 +2,9 @@
 #define _ASYNC_SCROLLING_MESSAGE_HPP_
 
 /**
+ * AsyncScrollingMessage
+ * Copyright (c) 2025 Daniel Savaria
+ *
  * A class to make it easier to display scrolling messages on the Arudino Uno
  * R4 LED matrix asynchronously--meaning the Arudino can run other code while
  * the message is scrolling.
